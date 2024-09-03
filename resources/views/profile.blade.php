@@ -70,13 +70,13 @@
             <div class="mb-8">
                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex" aria-label="Tabs">
-                        <button class="tab-btn text-[var(--hover-color)] border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="learning">
+                        <button class="tab-btn hover:text-[var(--hover-color)] text-[var(--hover-color)] hover:border-[var(--hover-color)] border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="learning">
                             Aprendizaje
                         </button>
-                        <button class="tab-btn text-gray-500 border-transparent whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="teaching">
+                        <button class="tab-btn hover:text-[var(--hover-color)] hover:border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="teaching">
                             Enseñanza
                         </button>
-                        <button class="tab-btn text-gray-500 border-transparent whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="purchases">
+                        <button class="tab-btn hover:text-[var(--hover-color)] hover:border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="purchases">
                             Compras
                         </button>
                     </nav>

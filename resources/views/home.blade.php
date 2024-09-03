@@ -1,51 +1,110 @@
-<x-appLayout>
-    <main class="bg-white flex-1 flex flex-col">
-        <div class=" pb-4 pt-8 px-20 flex w-full">
-            <input type="text" placeholder="Buscar cursos, tutoriales..." class="bg-gray-50 text-[1.6rem] font-semibold w-full rounded-[20px] py-[1.2rem] px-[1.6rem] border-[#c3c6d6] border-solid border-[1px] outline-[var(--hover-color)]">
-        </div>
+<x-applayout>
+    <main class="flex-1 overflow-hidden bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="flex flex-col lg:flex-row items-center mb-16">
+                <div class="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                        Descubre. Aprende.<br>
+                        <span class="text-[var(--highlight-color)]">Crea.</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8">Nimi: El marketplace de conocimientos donde cada pasión encuentra su lugar.</p>
+                    <div class="space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
+                            Explorar Cursos
+                        </a>
+                        <a href="#" class="inline-block bg-gray-200 text-gray-800 font-semibold py-3 px-8 rounded-md hover:bg-gray-300 transition duration-300">
+                            Enseñar en Nimi
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:w-1/2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="https://via.placeholder.com/300x200" alt="Curso 1" class="rounded-lg shadow-md">
+                        <img src="https://via.placeholder.com/300x200" alt="Curso 2" class="rounded-lg shadow-md mt-8">
+                        <img src="https://via.placeholder.com/300x200" alt="Curso 3" class="rounded-lg shadow-md">
+                        <img src="https://via.placeholder.com/300x200" alt="Curso 4" class="rounded-lg shadow-md mt-8">
+                    </div>
+                </div>
+            </div>
 
-        <div class="">
-            <nav class=" flex mb-10 mt-12  justify-center flex-wrap gap-[2rem] md:gap-[4rem] [&>button]:px-3 [&>button]:py-2 [&>button]:text-[1.6rem] [&>button]:font-normal [&>button]:border-transparent [&>button]:text-[var(--text-color)] [&>button]:border-b-[2px] ">
-                <button class="tab active">Para ti</button>
-                <button class="tab">Siguiendo</button>
-                <button class="tab">Cursos</button>
-                <button class="tab">Crear</button>
-            </nav>
-        </div>
-        <div class="bg-white flex justify-center p-[3.2rem] flex-grow-1">
-            <div class=" w-full max-w-[400px] overflow-hidden shadow-md rounded-[10px] bg-[var(--card-bg)]">
-                <div class="bg-black text-white w-full flex justify-center items-center text-[2rem] ratio">
-                    [Video Placeholder]
+            <div class="mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Explora Mundos de Conocimiento</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    @foreach(['Arte', 'Tecnología', 'Cocina', 'Música', 'Negocios', 'Idiomas', 'Fotografía', 'Bienestar'] as $category)
+                        <a href="#" class="bg-gray-100 rounded-lg p-6 text-center hover:bg-[var(--card-bg)] transition duration-300">
+                            <span class="block text-xl font-semibold text-gray-800">{{ $category }}</span>
+                        </a>
+                    @endforeach
                 </div>
-                <div class="p-8">
-                    <h3 class="text-[#353535] font-semibold text-[1.6rem] mb-2">Aprende a programar en 30 días</h3>
-                    <p class="text-[#353535] text-[1.2rem]">Descubre los fundamentos de la programación con este curso intensivo.</p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-8 mb-16">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Comparte tu Pasión</h2>
+                    <p class="text-gray-600 mb-6">En Nimi, creemos que todos tienen algo valioso que enseñar. ¿Listo para compartir tu conocimiento?</p>
+                    <a href="#" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
+                        Crea tu Primer Curso
+                    </a>
                 </div>
-                <div class="border-t px-8 py-6 flex justify-between">
-                    <button class="flex items-center text-gray-800 hover:text-gray-900 text-[1.4rem]">
-                        <svg class="w-[2rem] h-[2rem] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                        </svg>
-                        Me gusta
-                    </button>
-                    <button class="flex items-center text-gray-800 hover:text-gray-900 text-[1.4rem]">
-                        <svg class="w-[2rem] h-[2rem] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                        Comentar
-                    </button>
-                    <button class="flex items-center text-gray-800 hover:text-gray-900 text-[1.4rem]">
-                        <svg class="w-[2rem] h-[2rem] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        Compartir
-                    </button>
+            </div>
+
+            <div class="mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Cursos Destacados</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @foreach(range(1, 3) as $index)
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:shadow-xl">
+                            <img src="https://via.placeholder.com/400x225" alt="Curso {{ $index }}" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">Curso Inspirador {{ $index }}</h3>
+                                <p class="text-gray-600 mb-4">Descubre habilidades únicas de creadores apasionados.</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[var(--highlight-color)] font-semibold">$24.99</span>
+                                    <a href="#" class="text-gray-600 hover:text-[var(--highlight-color)]">Más información →</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Por qué Crear en Nimi</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-emerald-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Alcanza a estudiantes de todo el mundo</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-emerald-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Herramientas fáciles de usar para crear contenido</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-emerald-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Gana dinero compartiendo tu conocimiento</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-emerald-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">Únete a una comunidad de creadores apasionados</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-[var(--card-bg)] rounded-lg p-6">
+                    <h3 class="text-2xl font-bold text-black mb-4">Comienza tu Viaje como Creador</h3>
+                    <p class="text-gray-400 mb-6">Únete a miles de creadores que ya están compartiendo su pasión y ganando con Nimi.</p>
+                    <a href="#" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
+                        Empieza Ahora
+                    </a>
                 </div>
             </div>
         </div>
-        
-
-
-        
     </main>
 </x-appLayout>

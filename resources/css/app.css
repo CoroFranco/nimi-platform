@@ -5,16 +5,17 @@
 /* VARIABLES GLOBALES */
 
 :root {
-    --background-index: #0b0c1a;
-    --background-main: #f7f7f7;
+    --background-index: #1b1025;
+    --background-main: #ffffff;
     --text-color-index: #f1f2fd;
     --text-color: #0a0a0a;
     --menu-bg: rgb(252, 255, 253);
-    --card-bg: #ffffff;
-    --accent-color: #124938;
-    --main-color:#124938;
-    --hover-color: #10b981;
-    --highlight-color: #10b981;
+    --card-bg: #e3fdfd;
+    --courses-bg: rgb(253, 252, 255);
+    --accent-color: #1e2f77;
+    --main-color:#181249;
+    --hover-color: #1566c4;
+    --highlight-color: #1083b9;
     --input-bg: rgba(255, 255, 255, 0.05);
     --main-font: "Roboto Condensed", sans-serif;
 }
@@ -34,9 +35,9 @@ html {
 /* UTILIDADES EFECTOS ANIMACIONES */
 
 .shadowNav {
-    -webkit-box-shadow: 18px -12px 25px -22px rgba(5, 138, 16, 0.781);
-    -moz-box-shadow: 18px -12px 25px -22px rgb(5, 138, 65);
-    box-shadow: 18px -12px 25px -22px rgba(5, 138, 49, 0.568);
+    -webkit-box-shadow: 18px -12px 25px -22px var(--highlight-color);
+    -moz-box-shadow: 18px -12px 25px -22px var(--highlight-color);
+    box-shadow: 18px -12px 15px -22px var(--highlight-color);
 }
 
 .stars {
