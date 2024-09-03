@@ -10,7 +10,7 @@
     --text-color-index: #f1f2fd;
     --text-color: #0a0a0a;
     --menu-bg: rgb(252, 255, 253);
-    --card-bg: #e3fdfd;
+    --card-bg: #e8faff;
     --courses-bg: rgb(253, 252, 255);
     --accent-color: #1e2f77;
     --main-color:#181249;
@@ -30,6 +30,10 @@ html {
 *:before,
 *:after {
     box-sizing: inherit;
+}
+
+th {
+    padding: 8px;
 }
 
 /* UTILIDADES EFECTOS ANIMACIONES */
@@ -97,6 +101,15 @@ html {
 }
 
 /* INPUTS BOTONES */
+.instructorFormInput {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1.3rem;
+    width: 100%;
+    border: 1px solid rgb(178, 182, 182);
+    padding: 0.5rem 1rem;
+}
+
 .porfileInput {
     background-color: var(--input-bg);
     color: var(--text-color);

@@ -9,10 +9,13 @@
                     </h1>
                     <p class="text-xl text-gray-600 mb-8">Nimi: El marketplace de conocimientos donde cada pasión encuentra su lugar.</p>
                     <div class="space-y-4 sm:space-y-0 sm:space-x-4">
-                        <a href="#" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
+                        <a href="{{route('explorer')}}" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
                             Explorar Cursos
                         </a>
-                        <a href="#" class="inline-block bg-gray-200 text-gray-800 font-semibold py-3 px-8 rounded-md hover:bg-gray-300 transition duration-300">
+                        @php
+                            $instructorRoute = Auth::check() ? route('become.instructor.form') : route('welcome');
+                        @endphp
+                        <a href="{{$instructorRoute}}" class="inline-block bg-gray-200 text-gray-800 font-semibold py-3 px-8 rounded-md hover:bg-gray-300 transition duration-300">
                             Enseñar en Nimi
                         </a>
                     </div>
@@ -42,7 +45,7 @@
                 <div class="max-w-3xl mx-auto text-center">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Comparte tu Pasión</h2>
                     <p class="text-gray-600 mb-6">En Nimi, creemos que todos tienen algo valioso que enseñar. ¿Listo para compartir tu conocimiento?</p>
-                    <a href="#" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
+                    <a href="{{$instructorRoute}}" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
                         Crea tu Primer Curso
                     </a>
                 </div>
@@ -99,8 +102,8 @@
                 </div>
                 <div class="bg-[var(--card-bg)] rounded-lg p-6">
                     <h3 class="text-2xl font-bold text-black mb-4">Comienza tu Viaje como Creador</h3>
-                    <p class="text-gray-400 mb-6">Únete a miles de creadores que ya están compartiendo su pasión y ganando con Nimi.</p>
-                    <a href="#" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
+                    <p class="text-gray-600 mb-6">Únete a miles de creadores que ya están compartiendo su pasión y ganando con Nimi.</p>
+                    <a href="{{route('become.instructor.form')}}" class="inline-block bg-[var(--highlight-color)] text-white font-semibold py-3 px-8 rounded-md hover:bg-[var(--hover-color)] transition duration-300">
                         Empieza Ahora
                     </a>
                 </div>

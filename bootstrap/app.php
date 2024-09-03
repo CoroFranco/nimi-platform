@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             '-guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             '-auth' => \App\Http\Middleware\Authenticate::class,
+            '-authInstructor' => \App\Http\Middleware\InstructorAuth::class,
+            '-authAdmin' => \App\Http\Middleware\AdminAuth::class,
 
         ]);
 
