@@ -34,9 +34,14 @@ class Course extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function modules()
+    {
+        return $this->hasMany(Module::class)->orderBy('mod_order');
+    }
+
     public function lessons()
     {
-        return $this->hasMany(Lesson::class)->orderBy('less_order');
+        return $this->hasManyThrough(Lesson::class, Module::class);
     }
 
     public function enrollments()

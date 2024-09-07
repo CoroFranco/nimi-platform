@@ -10,7 +10,7 @@ class Lesson extends Model
     use HasFactory;
 
     protected $fillable = [
-        'course_id',
+        'module_id',
         'title',
         'description',
         'less_order',
@@ -19,9 +19,14 @@ class Lesson extends Model
         'duration',
     ];
 
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
+
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->module->course;
     }
 
     public function progress()
@@ -37,5 +42,13 @@ class Lesson extends Model
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Get the quiz questions for the lesson.
+     */
+    public function quizQuestions()
+    {
+        return $this->hasMany(QuizQuestion::class);
     }
 }

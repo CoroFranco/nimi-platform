@@ -6,13 +6,7 @@ const openModalBtn = document.getElementById('open-modal');
 const cancelBtn = document.getElementById('cancelDelete');
 const confirmBtn = document.getElementById('confirmDelete');
 
-openModalBtn.addEventListener('click', () => {
-    modal.classList.remove('hidden');
-});
 
-cancelBtn.addEventListener('click', () => {
-    modal.classList.add('hidden');
-});
 
 
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -23,8 +17,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
     if (alert) {
         setTimeout(function () {
             alert.classList.add('hidden')
-        }, 5000); // Desaparece después de 5 segundos (5000 ms)
+        }, 3000); // Desaparece después de 3 segundos (3000 ms)
     }
+});
+
+openModalBtn.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+});
+
+cancelBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
 });
 
 

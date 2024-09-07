@@ -16,6 +16,7 @@ class InstructorApplication extends Model
         'teaching_experience',
         'sample_video',
         'social_media',
+        'status',
     ];
 
     protected $casts = [

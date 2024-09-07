@@ -54,22 +54,43 @@ Route::middleware(['-auth'])->group(function () {
 
 
     // Rutas para cursos
-    Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+
     Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
     Route::get('/show/{course}', [CourseController::class, 'show'])->name('courses.show');
     Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
     Route::put('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
     Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::post('/courses/autosave', [CourseController::class, 'autosave'])->name('courses.autosave');
 
     // Rutas para lecciones
     Route::post('/lessons', [LessonController::class, 'store'])->name('lessons.store');
     Route::put('/lessons/{lesson}', [LessonController::class, 'update'])->name('lessons.update');
     Route::delete('/lessons/{lesson}', [LessonController::class, 'destroy'])->name('lessons.destroy');
+
+
+    // Ruta para mostrar una lección específica de un curso
+    Route::get('/courses/{course}/lessons/{lesson}', [LessonController::class, 'show'])
+        ->name('courses.lesson');
+
+    // Ruta para enviar un cuestionario
+    Route::post('/courses/{course}/lessons/{lesson}/submit-quiz', [LessonController::class, 'submitQuiz'])
+        ->name('courses.submit-quiz');
+
+    // Ruta para marcar un curso como completado
+    Route::post('/courses/{course}/complete', [CourseController::class, 'complete'])
+        ->name('courses.complete');
+
+    Route::post('/courses/{course}/lessons/{lesson}/complete', [LessonController::class, 'completeLesson'])
+        ->name('courses.completeLesson');
+
+    Route::post('/courses/{course}/lessons/{lesson}/comment', [LessonController::class, 'addComment'])
+        ->name('courses.addComment');
+
+    Route::delete('/courses/{course}/lessons/{lesson}/comments/{comment}', [LessonController::class, 'deleteComment'])
+        ->name('courses.deleteComment');
+
+    Route::get('/courses/{course}/lessons/{lesson}/comments', [LessonController::class, 'getComments'])->name('courses.getComments');
 });
-
-// Ruta pública para listar cursos
-Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
-
 
 
 

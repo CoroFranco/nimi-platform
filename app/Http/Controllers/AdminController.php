@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InstructorApplication;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -21,9 +22,12 @@ class AdminController extends Controller
 
     public function updateStatus(Request $request, InstructorApplication $application)
 {
+
     $request->validate([
         'status' => 'required|in:pending,approved,rejected',
     ]);
+
+
 
     $application->update(['status' => $request->status]);
 

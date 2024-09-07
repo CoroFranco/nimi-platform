@@ -9,13 +9,16 @@
     --background-main: #ffffff;
     --text-color-index: #f1f2fd;
     --text-color: #0a0a0a;
+    --text-gray:#d8d8d8;
     --menu-bg: rgb(252, 255, 253);
     --card-bg: #e8faff;
     --courses-bg: rgb(253, 252, 255);
     --accent-color: #1e2f77;
     --main-color:#181249;
     --hover-color: #1566c4;
-    --highlight-color: #1083b9;
+    --highlight-color: #1091b9;
+    --course-card-bg: #202020;
+    --course-main-color: #f6ffff;
     --input-bg: rgba(255, 255, 255, 0.05);
     --main-font: "Roboto Condensed", sans-serif;
 }
