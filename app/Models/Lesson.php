@@ -44,6 +44,11 @@ class Lesson extends Model
         return $this->morphMany(Like::class, 'likeable');
     }
 
+    public function lessonProgress()
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
+
     /**
      * Get the quiz questions for the lesson.
      */

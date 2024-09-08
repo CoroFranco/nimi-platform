@@ -11,6 +11,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\CourseApiController;
 use App\Models\User;
 use GuzzleHttp\Middleware;
@@ -62,10 +63,16 @@ Route::middleware(['-auth'])->group(function () {
     Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
     Route::post('/courses/autosave', [CourseController::class, 'autosave'])->name('courses.autosave');
 
+    // Editar mis cursos
+    Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+
+    //rutas modulos
+    Route::delete('/courses/{course}/modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
+
     // Rutas para lecciones
     Route::post('/lessons', [LessonController::class, 'store'])->name('lessons.store');
     Route::put('/lessons/{lesson}', [LessonController::class, 'update'])->name('lessons.update');
-    Route::delete('/lessons/{lesson}', [LessonController::class, 'destroy'])->name('lessons.destroy');
+    Route::delete('/courses/{course}/modules/{module}/lessons/{lesson}', [LessonController::class, 'destroy'])->name('lessons.destroy');
 
 
     // Ruta para mostrar una lección específica de un curso
@@ -83,6 +90,8 @@ Route::middleware(['-auth'])->group(function () {
     Route::post('/courses/{course}/lessons/{lesson}/complete', [LessonController::class, 'completeLesson'])
         ->name('courses.completeLesson');
 
+
+    // Rutas para comentarios
     Route::post('/courses/{course}/lessons/{lesson}/comment', [LessonController::class, 'addComment'])
         ->name('courses.addComment');
 

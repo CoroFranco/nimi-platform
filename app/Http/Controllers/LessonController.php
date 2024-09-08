@@ -7,51 +7,65 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\LessonProgress;
 use App\Models\Comment;
+use App\Models\Module;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class LessonController extends Controller
 {
     use AuthorizesRequests;
 
     public function show(Course $course, Lesson $lesson)
-    {
-        $enrollment = Enrollment::where('user_id', Auth::id())
+{   
+    $user = Auth::user();
+    $isInstructor = $course->instructor_id === $user->id;
+    $enrollment = null;
+
+    // Permitir acceso al instructor sin necesidad de inscripción
+    if (!$isInstructor) {
+        $enrollment = Enrollment::where('user_id', $user->id)
             ->where('course_id', $course->id)
-            ->firstOrFail();
+            ->first();
 
-        $course->load('modules.lessons');
-
-        $allLessons = $course->modules->flatMap->lessons->sortBy('less_order');
-        $currentIndex = $allLessons->search($lesson);
-        $previousLesson = $currentIndex > 0 ? $allLessons[$currentIndex - 1] : null;
-        $nextLesson = $currentIndex < $allLessons->count() - 1 ? $allLessons[$currentIndex + 1] : null;
-
-        $completedLessonIds = LessonProgress::where('user_id', Auth::id())
-            ->where('status', 'completed')
-            ->pluck('lesson_id')
-            ->toArray();
-
-        $totalLessons = $allLessons->count();
-        $completedLessons = count($completedLessonIds);
-        $progress = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
-
-        $comments = $lesson->comments()->with('user')->orderBy('created_at', 'desc')->get();
-
-        return view('courses', compact(
-            'course',
-            'lesson',
-            'enrollment',
-            'progress',
-            'completedLessons',
-            'totalLessons',
-            'previousLesson',
-            'nextLesson',
-            'completedLessonIds',
-            'comments'
-        ));
+        if (!$enrollment) {
+            abort(403, 'You are not enrolled in this course.');
+        }
     }
+
+    $course->load('modules.lessons');
+
+    $allLessons = $course->modules->flatMap->lessons->sortBy('less_order');
+    $currentIndex = $allLessons->search($lesson);
+    $previousLesson = $currentIndex > 0 ? $allLessons[$currentIndex - 1] : null;
+    $nextLesson = $currentIndex < $allLessons->count() - 1 ? $allLessons[$currentIndex + 1] : null;
+
+    $completedLessonIds = LessonProgress::where('user_id', Auth::id())
+        ->where('status', 'completed')
+        ->pluck('lesson_id')
+        ->toArray();
+
+    $totalLessons = $allLessons->count();
+    $completedLessons = count($completedLessonIds);
+    $progress = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
+
+    $comments = $lesson->comments()->with('user')->orderBy('created_at', 'desc')->get();
+
+    return view('courses', compact(
+        'course',
+        'lesson',
+        'enrollment',
+        'isInstructor',
+        'progress',
+        'completedLessons',
+        'totalLessons',
+        'previousLesson',
+        'nextLesson',
+        'completedLessonIds',
+        'comments'
+    ));
+}
 
     public function completeLesson(Request $request, Course $course, Lesson $lesson)
     {
@@ -194,4 +208,14 @@ public function getComments(Course $course, Lesson $lesson, Request $request)
 
         return redirect()->back()->with('success', 'Certificate generated successfully!');
     }
+
+    public function destroy(Course $course, Module $module, Lesson $lesson)
+{
+    if ($lesson->module_id !== $module->id || $module->course_id !== $course->id) {
+        return response()->json(['message' => 'Lección no encontrada'], 404);
+    }
+
+    $lesson->delete();
+    return response()->json(['message' => 'Lección eliminada exitosamente']);
+}
 }
