@@ -13,6 +13,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\CourseApiController;
+use App\Http\Controllers\EnrollmentController;
 use App\Models\User;
 use GuzzleHttp\Middleware;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated as MiddlewareRedirectIfAuthenticated;
@@ -21,7 +22,6 @@ use function Pest\Laravel\delete;
 use function Pest\Laravel\withoutMiddleware;
 
 // Rutas públicas
-
 
 Route::get('/home', [NavController::class, 'home'])->name('home');
 
@@ -35,8 +35,13 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 Route::get('/explorer', [NavController::class, 'explorer'])->name('explorer');
 Route::get('/explorer/search', [NavController::class, 'search'])->name('api.courses.search');
 
-Route::middleware(['-authInstructor'])->group(function () {
+Route::middleware(['-redirectInstructor'])->group(function(){
+    Route::get('/become-instructor', [InstructorController::class, 'showApplicationForm'])->name('become.instructor.form');
+    Route::post('/become-instructor', [InstructorController::class, 'submitApplication'])->name('become.instructor');
 
+});
+
+Route::middleware(['-authInstructor'])->group(function () {
     Route::get('/myCourses', [NavController::class, 'myCourses'])->name('myCourses');
     Route::get('/create', [NavController::class, 'muestras'])->name('create');
 });
@@ -44,15 +49,15 @@ Route::middleware(['-authInstructor'])->group(function () {
 
 Route::middleware(['-auth'])->group(function () {
 
-    Route::get('/become-instructor', [InstructorController::class, 'showApplicationForm'])->name('become.instructor.form');
-    Route::post('/become-instructor', [InstructorController::class, 'submitApplication'])->name('become.instructor');
 
     Route::get('/home/profile', [ProfileController::class, 'profile'])->name('profile');
     Route::post('home/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('home/profile/deleteAccount', [ProfileController::class, 'deleteAccount'])->name('delete.account');
     Route::post('home/profile/updatePassword', [ProfileController::class, 'updatePassword'])->name('update.password');
 
+    // Rutas para inscripciones/compras
 
+    Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll'])->name('enrollment');
 
     // Rutas para cursos
 

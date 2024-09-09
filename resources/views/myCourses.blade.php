@@ -28,6 +28,17 @@
                             <td class="py-4 px-6 text-sm text-gray-500">{{ $course->category->name }}</td>
                             <td class="py-4 px-6 text-sm text-gray-500">${{ number_format($course->price, 2) }}</td>
                             <td class="py-4 px-6 text-sm text-gray-500">{{ ucfirst($course->status) }}</td>
+                            <td>
+                                @if($course->modules->isNotEmpty() && $course->modules->first()->lessons->isNotEmpty())
+                                @php
+                                    $lesson = $course->modules->first()->lessons->first();
+                                @endphp
+                                <a href="{{ route('courses.lesson', [$course->id, $lesson->id]) }}" class="text-indigo-600 hover:text-indigo-900">Ver Curso</a>
+                            @else
+                                <span class="text-gray-500">Sin lecciones</span>
+                            @endif
+                            </td>
+                            
                             <td class="py-4 px-6 text-sm text-gray-500 space-x-2">
                                 <a href="{{ route('courses.edit', $course->id) }}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
                                 <button onclick="confirmDelete({{ $course->id }})" class="text-red-600 hover:text-red-900">Eliminar</button>

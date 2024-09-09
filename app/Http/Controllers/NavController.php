@@ -31,44 +31,51 @@ class NavController extends Controller
     public function myCourses()
     {
         $id = Auth::id(); // Obtener el ID del usuario autenticado
-        $courses = Course::where('instructor_id', $id)->get(); // Obtener los cursos asociados al ID
+
+        // Obtener los cursos asociados al ID y cargar las lecciones asociadas
+        $courses = Course::where('instructor_id', $id)
+        ->with(['modules.lessons' => function ($query) {
+            $query->orderBy('less_order'); // Ordenar y cargar la primera lección
+        }])
+        ->get();
+
         return view('myCourses', compact('courses'));
     }
 
     public function search(Request $request)
     {
-    
+
         $query = Course::query();
-    
+
         // Búsqueda por término
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', "{$searchTerm}%");
             });
         }
-    
+
         // Filtros por categorías
         if ($request->filled('categories')) {
             $categories = explode(',', $request->input('categories'));
             $query->whereIn('category_id', $categories);
         }
-    
+
         // Filtros por niveles
         if ($request->filled('levels')) {
             $levels = explode(',', $request->input('levels'));
             $query->whereIn('level', $levels);
         }
-    
+
         // Filtros por precio
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->input('min_price'));
         }
-    
+
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->input('max_price'));
         }
-    
+
         // Ordenamiento
         $sort = $request->input('sort', 'newest');
         switch ($sort) {
@@ -86,8 +93,8 @@ class NavController extends Controller
                 $query->orderBy('created_at', 'desc');
                 break;
         }
-        
-    
+
+
         $courses = $query->with('category')->paginate(12);
 
 
@@ -98,8 +105,8 @@ class NavController extends Controller
                 'last_page' => $courses->lastPage(),
                 'per_page' => $courses->perPage(),
                 'total' => $courses->total(),
-                
+
             ],
         ]);
-}
+    }
 }

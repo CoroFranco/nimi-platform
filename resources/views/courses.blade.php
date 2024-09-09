@@ -129,16 +129,26 @@
 
                         <div id="contentSection">
                             @if ($lesson->type === 'video')
+                            @php
+                                    $isQuiz = false;
+                                @endphp
                                 <div class="aspect-w-16 aspect-h-9 mb-4">
                                     <iframe src="{{ $lesson->content }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full rounded-lg"></iframe>
                                 </div>
                             @elseif ($lesson->type === 'text')
+                            @php
+                                    $isQuiz = false;
+                                @endphp
                                 <div class="text-white text-[1.5rem]">
                                     {!! $lesson->content !!}
                                 </div>
                             @elseif ($lesson->type === 'quiz')
-                                <form action="{{ route('courses.submit-quiz', ['course' => $course->id, 'lesson' => $lesson->id]) }}" method="POST">
+                                @php
+                                    $isQuiz = true;
+                                @endphp
+                                <form id="quiz-form" method="POST">
                                     @csrf
+                                    
                                     @foreach ($lesson->quizQuestions as $question)
                                         <div class="mb-6 p-4 bg-[var(--course-card-bg)] rounded-lg text-[1.5rem]">
                                             <p class="font-semibold mb-3 text-[var(--course-main-color)]">{{ $question->question }}</p>
@@ -152,6 +162,7 @@
                                     @endforeach
                                     <button type="submit" class="text-[1.5rem] bg-[var(--hover-color)] text-[var(--text-gray)] px-6 py-2 rounded-md hover:bg-[var(--highlight-color)] transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--hover-color)] focus:ring-offset-2 focus:ring-offset-[var(--course-card-bg)]">Submit Quiz</button>
                                 </form>
+                                <div class="m-10 flex justify-center gap-10 text-[1.5rem] text-[var(--text-color-index)]" id="quiz-results"></div> <!-- Aquí los resultados del quiz -->
                             @endif
                         </div>
 
@@ -201,10 +212,12 @@
                             @else
                                 <div></div>
                             @endif
+
+
                             @if (!in_array($lesson->id, $completedLessonIds))
                                 <form action="{{ route('courses.completeLesson', ['course' => $course->id, 'lesson' => $lesson->id]) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="bg-green-600 text-[var(--text-gray)] px-4 py-2 rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[var(--course-card-bg)] flex items-center">
+                                    <button style="display: {{ $isQuiz ? 'none' : 'flex' }};" type="submit" class="bg-green-600 text-[var(--text-gray)] px-4 py-2 rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[var(--course-card-bg)] flex items-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                         Mark as Completed
                                     </button>
@@ -405,6 +418,45 @@
         .catch(error => {
             console.error('Error posting comment:', error);
         });
+});
+
+document.getElementById('quiz-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevenir que se recargue la página
+
+    const formData = new FormData(this); // Obtener los datos del formulario
+    const quizResultsDiv = document.getElementById('quiz-results');
+
+    fetch('{{ route("courses.submit-quiz", [$course->id, $lesson->id]) }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData
+    })
+    .then(response => response.json()) // Parsear la respuesta como JSON
+    .then(data => {
+        if (data.success) {
+            console.log(typeof data.quizResults.score);
+                if(data.quizResults.score > 50){
+                    quizResultsDiv.innerHTML = `
+                <p class='text-green-500'>Puntaje: ${data.quizResults.score}%</p>
+                <p class='text-green-500'>Respuestas Correctas: ${data.quizResults.correctAnswers} de ${data.quizResults.totalQuestions}</p>
+            `;
+                }else{
+                    quizResultsDiv.innerHTML = `
+                <p class='text-red-500'>Puntaje: ${data.quizResults.score}%</p>
+                <p class='text-red-500'>Respuestas Correctas: ${data.quizResults.correctAnswers} de ${data.quizResults.totalQuestions}</p>
+            `;
+                }
+
+        } else {
+            quizResultsDiv.innerHTML = `<p>Hubo un error al procesar el cuestionario.</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        quizResultsDiv.innerHTML = `<p>Hubo un error al procesar el cuestionario.</p>`;
+    });
 });
 
 

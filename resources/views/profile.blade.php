@@ -46,38 +46,42 @@
         </ul>
     </div>
 @endif
+
+
+    @php
+        $coursesInProgress = 0;
+        $coursesCompleted = 0;
+        foreach($courses as $course){
+            if ($courseProgress[$course->id] != 100) {
+            $coursesInProgress++;
+        }else {
+            $coursesCompleted++;
+        }
+        }
+            
+    @endphp
             <!-- Estadísticas del usuario -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                    <p class="text-3xl font-bold text-[var(--hover-color)]">12</p>
+                    <p class="text-3xl font-bold text-[var(--hover-color)]">{{$coursesInProgress}}</p>
                     <p class="text-gray-600">Cursos en progreso</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                    <p class="text-3xl font-bold text-[var(--hover-color)]">25</p>
+                    <p class="text-3xl font-bold text-[var(--hover-color)]">{{$coursesCompleted}}</p>
                     <p class="text-gray-600">Cursos completados</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                    <p class="text-3xl font-bold text-[var(--hover-color)]">5</p>
+                    <p class="text-3xl font-bold text-[var(--hover-color)]">{{$coursesCreated}}</p>
                     <p class="text-gray-600">Cursos creados</p>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-md text-center">
-                    <p class="text-3xl font-bold text-[var(--hover-color)]">4.8</p>
-                    <p class="text-gray-600">Calificación promedio</p>
                 </div>
             </div>
     
             <!-- Pestañas para diferentes secciones -->
             <div class="mb-8">
                 <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex" aria-label="Tabs">
-                        <button class="tab-btn hover:text-[var(--hover-color)] text-[var(--hover-color)] hover:border-[var(--hover-color)] border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="learning">
+                    <nav class="flex justify-center" aria-label="Tabs">
+                        <button class="text-[2rem] hover:text-[var(--hover-color)] text-[var(--hover-color)] hover:border-[var(--hover-color)] border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium" data-tab="learning">
                             Aprendizaje
-                        </button>
-                        <button class="tab-btn hover:text-[var(--hover-color)] hover:border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="teaching">
-                            Enseñanza
-                        </button>
-                        <button class="tab-btn hover:text-[var(--hover-color)] hover:border-[var(--hover-color)] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="purchases">
-                            Compras
                         </button>
                     </nav>
                 </div>
@@ -85,29 +89,41 @@
     
             <!-- Contenido de las pestañas -->
             <div id="learning" class="tab-content">
-                <section class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Cursos en progreso</h2>
+                <section class="mb-8 text-center">
+                    <h2 class="text-[2rem] font-bold text-gray-800 mb-10">Cursos en progreso</h2>
+                    @if($courses-> isEmpty())
+                    <h2 class="mb-10">No tiene cursos en este momento</h2>
+                    <div>
+                        <a class="px-6 py-2 bg-[var(--highlight-color)] text-[1.5rem] text-[var(--text-color-index)] mt-20 hover:bg-[var(--hover-color)]" href="/explorer">Busca un curso para ti</a>
+                    </div>
+                        
+                        @else
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-white p-4 rounded-lg shadow-md">
-                            <h3 class="font-bold text-lg text-[var(--hover-color)] mb-2">Introducción a la Programación</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-gray-600">Progreso: 60%</span>
-                                <span class="text-[var(--hover-color)]">12/20 lecciones</span>
+                        
+                        @foreach($courses as $course) 
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                @php
+                                    // Obtener la siguiente lección después de omitir las completadas
+                                    $nextLesson = $lessonsByCourse[$course->id]
+                                        ->sortBy('less_order')
+                                        ->skip($completedLessonsCountByCourse[$course->id]+1)
+                                        ->first();
+                                @endphp
+
+                                <a href="/courses/{{$course->id}}/lessons/{{$nextLesson ? $nextLesson->id : $lessonsByCourse[$course->id]->last()->id}}">
+                                    <h3 class="font-bold text-lg text-[var(--hover-color)] mb-2">{{$course->title}}</h3>
+                                </a>                                
+                              <div class="flex justify-between items-center mb-2">
+                                    <span class="text-gray-600">Progreso: {{$courseProgress[$course->id]}}%</span>
+                                    <span class="text-[var(--hover-color)]">{{$completedLessonsCountByCourse[$course->id]}}/{{$lessonsCountByCourse[$course->id]}} lecciones</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-[var(--hover-color)] h-2.5 rounded-full" style="width: {{$courseProgress[$course->id]}}%"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div class="bg-[var(--hover-color)] h-2.5 rounded-full" style="width: 60%"></div>
-                            </div>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-md">
-                            <h3 class="font-bold text-lg text-[var(--hover-color)] mb-2">Diseño UX/UI Avanzado</h3>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-gray-600">Progreso: 30%</span>
-                                <span class="text-[var(--hover-color)]">6/20 lecciones</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div class="bg-[var(--hover-color)] h-2.5 rounded-full" style="width: 30%"></div>
-                            </div>
-                        </div>
+                        
+                        @endforeach
+                        @endif
                     </div>
                 </section>
             </div>

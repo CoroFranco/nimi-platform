@@ -8,6 +8,7 @@ use App\Models\Enrollment;
 use App\Models\LessonProgress;
 use App\Models\Comment;
 use App\Models\Module;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -42,9 +43,12 @@ class LessonController extends Controller
     $nextLesson = $currentIndex < $allLessons->count() - 1 ? $allLessons[$currentIndex + 1] : null;
 
     $completedLessonIds = LessonProgress::where('user_id', Auth::id())
-        ->where('status', 'completed')
-        ->pluck('lesson_id')
-        ->toArray();
+    ->whereHas('lesson.module.course', function ($query) use ($course) {
+        $query->where('id', $course->id);
+    })
+    ->where('status', 'completed')
+    ->pluck('lesson_id')
+    ->toArray();
 
     $totalLessons = $allLessons->count();
     $completedLessons = count($completedLessonIds);
@@ -67,40 +71,47 @@ class LessonController extends Controller
     ));
 }
 
-    public function completeLesson(Request $request, Course $course, Lesson $lesson)
-    {
-        $this->authorize('view', $course);
+public function completeLesson(Request $request, Course $course, Lesson $lesson)
+{
+    $this->authorize('view', $course);
 
-        $user = Auth::user();
+    $user = Auth::user();
 
-        // Mark the lesson as completed
-        LessonProgress::updateOrCreate(
-            ['user_id' => $user->id, 'lesson_id' => $lesson->id],
-            ['status' => 'completed']
-        );
-
-        // Update the course progress
-        $totalLessons = $course->lessons()->count();
-        $completedLessons = LessonProgress::where('user_id', $user->id)
-            ->whereIn('lesson_id', $course->lessons()->pluck('id'))
-            ->where('status', 'completed')
-            ->count();
-
-        $progress = ($completedLessons / $totalLessons) * 100;
-
-        // Update or create the enrollment record with the new progress
-        Enrollment::updateOrCreate(
-            ['user_id' => $user->id, 'course_id' => $course->id],
-            ['progress' => $progress]
-        );
-
-        // Check if the course is completed
-        if ($progress == 100) {
-            // You can add additional logic here for course completion (e.g., issuing a certificate)
-        }
-
-        return redirect()->back()->with('success', 'Lesson marked as completed!');
+    // Verifica que la lección pertenezca al curso actual
+    if (!$course->modules()->whereHas('lessons', function ($query) use ($lesson) {
+        $query->where('id', $lesson->id);
+    })->exists()) {
+        return redirect()->back()->with('error', 'This lesson does not belong to the course.');
     }
+
+    // Marca la lección como completada
+    LessonProgress::updateOrCreate(
+        ['user_id' => $user->id, 'lesson_id' => $lesson->id],
+        ['status' => 'completed']
+    );
+
+    // Calcula el progreso del curso
+    $totalLessons = $course->modules->flatMap->lessons->count();
+    $completedLessons = LessonProgress::where('user_id', $user->id)
+        ->whereIn('lesson_id', $course->modules->flatMap->lessons->pluck('id'))
+        ->where('status', 'completed')
+        ->count();
+
+    $progress = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
+
+    // Actualiza o crea el registro de inscripción con el nuevo progreso
+    Enrollment::updateOrCreate(
+        ['user_id' => $user->id, 'course_id' => $course->id],
+        ['progress' => $progress]
+    );
+
+    // Comprueba si el curso está completado
+    if ($progress == 100) {
+        // Aquí puedes agregar lógica adicional para la finalización del curso (por ejemplo, emisión de un certificado)
+    }
+
+    return redirect()->back()->with('success', 'Lesson marked as completed!');
+}
 
     public function submitQuiz(Request $request, Course $course, Lesson $lesson)
     {
@@ -114,28 +125,39 @@ class LessonController extends Controller
         $quizQuestions = $lesson->quizQuestions;
         $correctAnswers = 0;
 
+        
+        
+
         foreach ($quizQuestions as $question) {
-            if (
-                isset($validatedData['answers'][$question->id]) &&
-                $validatedData['answers'][$question->id] === $question->correct_answer
-            ) {
+            Log::info('Respuesta correcta: ' . $question->correct_answer);
+            Log::info('Respuesta del usuario: ' . $validatedData['answers'][$question->id]);
+        
+            if (trim($validatedData['answers'][$question->id]) === trim($question->correct_answer)) {
+                Log::info('¡Respuesta correcta!');
                 $correctAnswers++;
+            } else {
+                Log::info('Respuesta incorrecta');
             }
         }
 
+        
+
         $score = ($correctAnswers / $quizQuestions->count()) * 100;
 
-        if ($score >= 70) {  // Assuming 70% is the passing score
+        if ($score >= 70) {  // si 70% es que pasa
             LessonProgress::updateOrCreate(
                 ['user_id' => Auth::id(), 'lesson_id' => $lesson->id],
                 ['status' => 'completed']
             );
         }
 
-        return redirect()->back()->with('quizResults', [
-            'score' => $score,
-            'correctAnswers' => $correctAnswers,
-            'totalQuestions' => $quizQuestions->count(),
+        return response()->json([
+            'success' => true,
+            'quizResults' => [
+                'score' => $score,
+                'correctAnswers' => $correctAnswers,
+                'totalQuestions' => $quizQuestions->count(),
+            ]
         ]);
     }
 

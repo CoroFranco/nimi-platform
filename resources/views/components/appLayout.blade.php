@@ -101,7 +101,7 @@
     <footer class="bg-[var(--background-index)] text-[var(text-color)] mt-auto text-center">
         <div class="w-full mx-auto py-8 px-4 sm:px-10 lg:py-8 lg:px-24">
             <div class="sm:grid xl:grid-cols-3 place-items-center ">
-                <div class="flex md:grid xl:grid-cols-2 gap-8 xl:col-span-2 place-items-center">
+                <div class="flex justify-center md:grid xl:grid-cols-2 gap-8 xl:col-span-2 place-items-center">
                     <div class="md:grid md:grid-cols-2 md:gap-20 [&>div>h3]:text-[1.5rem] [&>div>h3]:font-semibold [&>div>h3]:text-gray-400 [&>div>h3]:tracking-wider [&>div>h3]:uppercase">
                         <div>
                             <h3 class="">Sobre Nimi</h3>

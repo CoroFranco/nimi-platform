@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '-auth' => \App\Http\Middleware\Authenticate::class,
             '-authInstructor' => \App\Http\Middleware\InstructorAuth::class,
             '-authAdmin' => \App\Http\Middleware\AdminAuth::class,
+            '-redirectInstructor' => \App\Http\Middleware\RedirectInstructor::class
 
         ]);
 

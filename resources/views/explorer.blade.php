@@ -51,7 +51,7 @@
                                     <input type="number" name="max_price" placeholder="Max" class="w-24 px-2 py-1 rounded-md bg-[var(--input-bg)] text-[var(--text-color)] border border-[var(--border-color)]">
                                 </div>
                             </div>
-                            <button type="submit" class="w-full px-4 py-2 bg-[var(--hover-color)] text-white rounded-md hover:bg-opacity-90 transition duration-300">
+                            <button type="submit" class="w-full px-4 py-2 bg-[var(--highlight-color)] hover:bg-[var(--hover-color)] text-white rounded-md hover:bg-opacity-90 transition duration-300">
                                 Aplicar Filtros
                             </button>
                         </form>
@@ -92,8 +92,7 @@
         let currentPage = 1;
         let debounceTimer;
     
-        // Set up CSRF token for all AJAX requests
-        axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     
         function debounce(func, delay) {
             clearTimeout(debounceTimer);
@@ -150,7 +149,7 @@
                                 <span class="text-[var(--hover-color)] font-bold">$${parseFloat(course.price).toFixed(2)}</span>
                                 <span class="text-[var(--text-color-secondary)] capitalize">${course.level}</span>
                             </div>
-                            <a href="/courses/${course.id}" class="text-[1.5rem] mt-4 block w-full text-center px-4 py-2 bg-[var(--hover-color)] text-white rounded-md hover:bg-opacity-90 transition duration-300">
+                            <a href="/show/${course.id}" class="text-[1.5rem] mt-4 block w-full text-center px-4 py-2 bg-[var(--highlight-color)] hover:bg-[var(--hover-color)] text-white rounded-md hover:bg-opacity-90 transition duration-300">
                                 Ver Curso
                             </a>
                         </div>

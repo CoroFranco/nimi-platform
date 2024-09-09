@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Enrollment;
+use App\Models\Course;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,9 +17,69 @@ class ProfileController extends Controller
 
 
     public function profile()
-    {
-        return view('profile');
+{
+    $user = Auth::user();
+    $coursesCreated = Course::where('instructor_id', $user->id)->get()->count();
+
+    // Obtener los enrollments del usuario
+    $enrollments = Enrollment::where('user_id', $user->id)->get();
+    Log::info($enrollments);
+
+    // Obtener los IDs de los cursos asociados a los enrollments
+    $courseIds = $enrollments->pluck('course_id');
+
+    // Obtener los cursos correspondientes y cargar sus módulos y lecciones en una sola consulta
+    $courses = Course::whereIn('id', $courseIds)
+                     ->with(['modules.lessons' => function($query) use ($user) {
+                         // Cargar las lecciones y también verificar si están completadas por el usuario
+                         $query->with(['lessonProgress' => function($subQuery) use ($user) {
+                             $subQuery->where('user_id', $user->id)
+                                      ->where('status', 'completed');
+                         }]);
+                     }])
+                     ->get();
+
+    // Inicializar arrays para almacenar las lecciones por curso, su conteo, las completadas y el progreso
+    $lessonsByCourse = [];
+    $lessonsCountByCourse = [];
+    $completedLessonsCountByCourse = [];
+    $courseProgress = [];
+
+    // Iterar sobre cada curso para procesar las lecciones
+    foreach ($courses as $course) {
+        // Obtener todas las lecciones de los módulos del curso y ordenarlas por 'less_order'
+        $lessons = $course->modules->flatMap->lessons->sortBy('less_order');
+
+        // Almacenar las lecciones en el array, usando el ID del curso como clave
+        $lessonsByCourse[$course->id] = $lessons;
+
+        // Contar las lecciones y almacenarlas en el array
+        $lessonsCountByCourse[$course->id] = $lessons->count();
+
+        // Contar cuántas lecciones están completadas
+        $completedLessonsCountByCourse[$course->id] = $lessons->filter(function($lesson) {
+            return $lesson->lessonProgress->isNotEmpty(); // Verifica si hay progreso completado
+        })->count();
+
+        // Calcular el progreso del curso en porcentaje
+        $totalLessons = $lessonsCountByCourse[$course->id];
+        $completedLessons = $completedLessonsCountByCourse[$course->id];
+        $courseProgress[$course->id] = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
     }
+
+    Log::info($courses);
+
+    return view('profile', compact(
+        'enrollments',
+        'courses',
+        'lessonsByCourse',
+        'lessonsCountByCourse',
+        'completedLessonsCountByCourse',
+        'courseProgress',
+        'coursesCreated'
+    ));
+}
+
 
     public function updateProfile(Request $request)
     {
@@ -76,21 +139,21 @@ class ProfileController extends Controller
     }
 
     public function deleteAccount(Request $request)
-{
-    $id = Auth::id();
+    {
+        $id = Auth::id();
 
-    if (!$id) {
-        return redirect()->route('login')->with('error', 'Debes estar autenticado para eliminar tu cuenta.');
+        if (!$id) {
+            return redirect()->route('login')->with('error', 'Debes estar autenticado para eliminar tu cuenta.');
+        }
+
+        $user = User::find($id);
+
+        if ($user) {
+            $user->delete();
+            Auth::logout(); // Cerrar la sesión antes de eliminar la cuenta
+            return redirect()->route('welcome')->with('success', 'Cuenta eliminada exitosamente.');
+        } else {
+            return redirect()->route('welcome')->with('error', 'Usuario no encontrado.');
+        }
     }
-
-    $user = User::find($id);
-
-    if ($user) {
-        $user->delete();
-        Auth::logout(); // Cerrar la sesión antes de eliminar la cuenta
-        return redirect()->route('welcome')->with('success', 'Cuenta eliminada exitosamente.');
-    } else {
-        return redirect()->route('welcome')->with('error', 'Usuario no encontrado.');
-    }
-}
 }
