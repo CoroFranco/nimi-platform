@@ -3,17 +3,8 @@
         <div class="max-w-[900px] w-[95%] mx-auto sm:px-6 lg:px-8">
             <h1 class="text-5xl font-bold mb-8">Solicitudes de Instructores</h1>
 
-            <div x-data="{ showMessage: false, message: '', isError: false }" 
-                 x-show="showMessage" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 transform scale-90"
-                 x-transition:enter-end="opacity-100 transform scale-100"
-                 x-transition:leave="transition ease-in duration-300"
-                 x-transition:leave-start="opacity-100 transform scale-100"
-                 x-transition:leave-end="opacity-0 transform scale-90"
-                 :class="isError ? 'bg-red-100 border-l-4 border-red-500 text-red-700' : 'bg-green-100 border-l-4 border-green-500 text-green-700'"
-                 class="p-6 mb-6 text-xl" role="alert">
-                <p x-text="message"></p>
+            <div id="messageContainer" class="hidden p-6 mb-6 text-xl" role="alert">
+                <p id="messageText"></p>
             </div>
 
             <div class="bg-[var(--background-main)] overflow-hidden shadow-xl sm:rounded-lg">
@@ -32,15 +23,15 @@
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
-                            <thead class="">
-                                <tr class="">
-                                    <th class=" border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
+                            <thead>
+                                <tr>
+                                    <th class="border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
                                         Usuario
                                     </th>
-                                    <th class=" border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
+                                    <th class="border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
                                         Experiencia
                                     </th>
-                                    <th class=" border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
+                                    <th class="border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
                                         Estado
                                     </th>
                                     <th class="border-b-2 border-gray-200 bg-gray-100 text-left text-lg font-semibold text-[var(--hover-color)] uppercase tracking-wider">
@@ -119,7 +110,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+
     <script>
     function openModal(applicationId) {
         fetch(`/admin/instructor-applications/${applicationId}`)
@@ -132,15 +123,15 @@
             .then(data => {
                 const socialMedia = JSON.parse(data.social_media);
 
-// Crear la lista de elementos <li>
-let socialMediaList = '';
-for (const [key, value] of Object.entries(socialMedia)) {
-    if (value) { // Verifica si hay un valor
-        socialMediaList += `
-            <li><strong class="font-semibold">${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> 
-            <a href="${value}" target="_blank" class="text-blue-600 hover:underline">${value}</a></li>`;
-    }
-}
+                // Crear la lista de elementos <li>
+                let socialMediaList = '';
+                for (const [key, value] of Object.entries(socialMedia)) {
+                    if (value) { // Verifica si hay un valor
+                        socialMediaList += `
+                            <li><strong class="font-semibold">${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> 
+                            <a href="${value}" target="_blank" class="text-blue-600 hover:underline">${value}</a></li>`;
+                    }
+                }
 
                 document.getElementById('modalContent').innerHTML = `
                     <p class="mb-4"><strong class="font-semibold">Nombre:</strong> ${data.user.name}</p>
@@ -150,8 +141,8 @@ for (const [key, value] of Object.entries(socialMedia)) {
                     <p class="mb-4"><strong class="font-semibold">Experiencia en enseñanza:</strong> ${data.teaching_experience}</p>
                     <p class="mb-4"><strong class="font-semibold">Video de muestra:</strong> <a href="${data.sample_video}" target="_blank" class="text-blue-600 hover:underline">Ver video</a></p>
                     <p class="mb-2"><strong class="font-semibold">Redes sociales:</strong></p>
-                    <ul >
-                         ${socialMediaList}
+                    <ul>
+                        ${socialMediaList}
                     </ul>
                 `;
                 document.getElementById('applicationModal').classList.remove('hidden');
@@ -166,76 +157,63 @@ for (const [key, value] of Object.entries(socialMedia)) {
         document.getElementById('applicationModal').classList.add('hidden');
     }
 
-    function updateStatus(applicationId, newStatus) {
-    if (!confirm('¿Estás seguro de que quieres cambiar el estado de esta solicitud?')) {
-        return;
-    }
-
-    fetch(`/admin/instructor-applications/${applicationId}/update-status`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ status: newStatus })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            showMessage(data.message, false);
-            updateUIAfterStatusChange(applicationId, newStatus);
-            // La llamada a updateUserRole se ha eliminado, ya que no es necesaria
-        } else {
-            showMessage('Error al actualizar el estado: ' + data.message, true);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('Ocurrió un error al actualizar el estado.', true);
-    });
-}
-
-
-    function showMessage(message, isError) {
-        const messageElement = document.querySelector('[x-data]');
-        messageElement.__x.$data.showMessage = true;
-        messageElement.__x.$data.message = message;
-        messageElement.__x.$data.isError = isError;
+    function showMessage(message, isError = false) {
+        const messageContainer = document.getElementById('messageContainer');
+        const messageText = document.getElementById('messageText');
+        
+        messageText.textContent = message;
+        messageContainer.classList.remove('hidden');
+        messageContainer.classList.toggle('bg-red-500', isError);
+        messageContainer.classList.toggle('bg-green-500', !isError);
+        
         setTimeout(() => {
-            messageElement.__x.$data.showMessage = false;
+            messageContainer.classList.add('hidden');
         }, 5000);
     }
 
-    function updateUIAfterStatusChange(applicationId, newStatus) {
-        const row = document.querySelector(`tr[data-application-id="${applicationId}"]`);
-        if (row) {
-            const statusSelect = row.querySelector('select');
-            statusSelect.value = newStatus;
-        }
+    function updateStatus(applicationId, status) {
+        fetch(`/admin/instructor-applications/${applicationId}/update-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ status })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showMessage('Estado actualizado exitosamente.', false);
+            } else {
+                showMessage('Error al actualizar el estado.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error al actualizar el estado.', true);
+        });
     }
 
     function filterApplications() {
-        const status = document.getElementById('statusFilter').value;
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const rows = document.getElementById('applicationsTable').getElementsByTagName('tr');
-
-        for (let i = 0; i < rows.length; i++) {
-            const statusCell = rows[i].getElementsByTagName('td')[2];
-            const nameCell = rows[i].getElementsByTagName('td')[0];
-            if (statusCell && nameCell) {
-                const statusValue = statusCell.querySelector('select').value;
-                const nameValue = nameCell.textContent || nameCell.innerText;
-                const showStatus = status === '' || statusValue === status;
-                const showSearch = search === '' || nameValue.toLowerCase().indexOf(search) > -1;
-                rows[i].style.display = showStatus && showSearch ? '' : 'none';
-            }
-        }
+        const statusFilter = document.getElementById('statusFilter').value;
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#applicationsTable tr');
+        
+        rows.forEach(row => {
+            const status = row.querySelector('select').value;
+            const name = row.querySelector('td:first-child').textContent.toLowerCase();
+            const email = row.querySelector('td:first-child').textContent.toLowerCase();
+            
+            const statusMatch = statusFilter === '' || status === statusFilter;
+            const searchMatch = name.includes(searchInput) || email.includes(searchInput);
+            
+            row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+        });
     }
     </script>
-
 </x-appLayout>
