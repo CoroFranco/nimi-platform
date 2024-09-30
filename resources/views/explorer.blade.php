@@ -117,11 +117,8 @@
                 page: currentPage
             };
 
-            console.log('Parámetros de búsqueda:', params);
-
             axios.get('{{ route("api.courses.search") }}', { params })
                 .then(response => {
-                    console.log('Cursos obtenidos:', response.data);
                     if (response.data.courses.length === 0) {
                         console.log('No se encontraron cursos. Verifica tus criterios de búsqueda.');
                     }

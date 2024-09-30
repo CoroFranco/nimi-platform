@@ -5,34 +5,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const resetForm = document.getElementById('resetForm');
     const toggleRegister = document.getElementById('toggleRegister');
     const toggleReset = document.getElementById('toggleReset');
+    const showAlertsDiv = document.getElementById('showAlerts')
 
-    
-    document.addEventListener('DOMContentLoaded', (event) => {
-        // Busca el elemento con la clase 'alert'
-        let alert = document.querySelector('.alert');
-    
-        // Si existe el elemento, configura un temporizador para ocultarlo
-        if (alert) {
-            setTimeout(function () {
-                alert.classList.add('hidden')
-            }, 5000); // Desaparece después de 5 segundos (5000 ms)
-        }
-    });
-
-    // Contenedores de mensajes
-    const errorContainer = createMessageContainer('error');
-    const successContainer = createMessageContainer('success');
 
     // Funciones auxiliares
     function createMessageContainer(type) {
         const container = document.createElement('div');
         const className = type === 'error'
-            ? 'mt-10 bg-red-100 border border-red-400 text-red-700'
-            : 'mt-10 bg-green-100 border border-green-400 text-green-700';
+        ? 'alert mt-10 bg-red-100 border border-red-400 text-red-700'
+        : 'alert mt-10 bg-green-100 border border-green-400 text-green-700';
         container.className = `${className} px-4 py-3 rounded relative mb-4 hidden`;
         return container;
     }
-
+    
+    // Contenedores de mensajes
+    const errorContainer = createMessageContainer('error');
+    const successContainer = createMessageContainer('success');
+    
     function showForm(formToShow) {
         [loginForm, registerForm, resetForm].forEach(form => {
             if (form) form.style.display = 'none';
@@ -48,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
             container.appendChild(messageElement);
         });
         container.classList.remove('hidden');
+        setTimeout(() => {
+            container.classList.add('hidden');
+        }, 3000);
     }
 
     function clearMessages() {
@@ -98,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function () {
             credentials: 'same-origin'
         })
             .then(response => response.json())
+
             .then(data => {
+                console.log(data)
                 if (data.errors) {
                     displayMessages(errorContainer, data.errors);
                 } else if (data.success) {
@@ -108,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 displayMessages(errorContainer, { general: ['Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.'] });
             });
     });
@@ -134,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         window.location.href = data.redirect;
                     }
                 } else {
-                    console.log(data.errors); // <-- Añade esto para ver los errores
                     if (data.errors) {
                         displayMessages(errorContainer, data.errors);
                     }
@@ -142,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         })
         .catch(error => {
-            console.error('Error:', error);
             displayMessages(errorContainer, { general: ['Hubo un problema al iniciar sesión. Por favor, inténtalo de nuevo.'] });
         });
     });
@@ -154,9 +145,8 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Agregar contenedores de mensajes a los formularios
-    registerForm.appendChild(errorContainer);
-    loginForm.appendChild(errorContainer);
-    loginForm.appendChild(successContainer);
+    showAlertsDiv.appendChild(errorContainer);
+    showAlertsDiv.appendChild(successContainer);
 
 
 

@@ -37,37 +37,37 @@
                     <label for="password">Contraseña</label>
                     <input class="indexInput" type="password" id="password" name="password" placeholder="*********" required>
                 </div>
-                <button class="indexButton" type="submit">Iniciar Sesión</button>
+                <button id="loginButton" class="indexButton" type="submit">Iniciar Sesión</button>
             </form>
 
-            <form id="registerForm" style="display: none;" method="post" action="register">
+            <form id="registerForm" style="display: none;" method="post" action="/register">
                 @csrf
                 <h2 class="uppercase font-bold text-center text-[2.5rem] text-[var(--highlight-color)] tracking-wider my-[24px]">Registrarse</h2>
                 <div>
                     <label for="registerName">Nombre</label>
-                    <input class="indexInput" type="text" id="registerName" name="name" placeholder="Ingresa tu nombre" required>
+                    <input class="indexInput" type="text" id="registerName" name="registerName" placeholder="Ingresa tu nombre" required>
                 </div>
                 <div>
                     <label for="registerEmail">Correo Electrónico</label>
-                    <input class="indexInput" type="email" id="registerEmail" name="email" placeholder="correo@ejemplo.com" required>
+                    <input class="indexInput" type="email" id="registerEmail" name="registerEmail" placeholder="correo@ejemplo.com" required>
                 </div>
                 <div>
                     <label for="registerPassword">Contraseña</label>
-                    <input class="indexInput" type="password" id="registerPassword" name="password" placeholder="*********" required>
+                    <input class="indexInput" type="password" id="registerPassword" name="registerPassword" placeholder="*********" required>
                 </div>
                 <div>
                     <label for="reapetPassword">Repetir Contraseña</label>
-                    <input class="indexInput" type="password" id="reapetPassword" name="reapetPassword" placeholder="*********" required>
+                    <input class="indexInput" type="password" id="reapetPassword" name="registerReapetPassword" placeholder="*********" required>
                     
                 </div>
-                <button class="indexButton" type="submit">Registrarse</button>
+                <button id="registerButton" class="indexButton" type="submit">Registrarse</button>
             </form>
 
             <form id="resetForm" style="display: none;">
                 <h2 class="uppercase font-bold text-center text-[2.5rem] text-[var(--highlight-color)] tracking-wider my-[24px]">Restablecer Contraseña</h2>
                 <div>
                     <label for="resetEmail">Correo Electrónico</label>
-                    <input class="indexInput" type="email" id="resetEmail" name="email" placeholder="correo@ejemplo.com" required>
+                    <input class="indexInput" type="email" id="resetEmail" name="recoveryEmail" placeholder="correo@ejemplo.com" required>
                 </div>
                 <button class="indexButton" type="submit">Enviar código</button>
             </form>
@@ -84,11 +84,11 @@
                 </x-slot>
                 ¿Olvidaste tu contraseña?
             </x-toggleForm>
-            @if(session('success'))
-            <div class="alert text-center text-[2rem] my-8 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative ">
-                {{ session('success') }}
+
+            <div id="showAlerts">
+
             </div>
-        @endif
+
         </div>
     </main>
 </body>

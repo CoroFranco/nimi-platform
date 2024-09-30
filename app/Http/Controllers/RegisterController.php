@@ -15,20 +15,20 @@ class RegisterController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:8|same:reapetPassword',
-                'reapetPassword' => 'required|string|min:8',
+                'registerName' => 'required|string|max:255',
+                'registerEmail' => 'required|email|unique:users,email',
+                'registerPassword' => 'required|string|min:8|same:registerReapetPassword',
+                'registerReapetPassword' => 'required|string|min:8',
             ], [
-                'email.unique' => 'Este correo electrónico ya está registrado.',
-                'password.same' => 'Las contraseñas no coinciden.',
+                'registerEmail.unique' => 'Este correo electrónico ya está registrado.',
+                'registerPassword.same' => 'Las contraseñas no coinciden.',
             ]);
 
             // Crear un nuevo usuario y guardarlo en la base de datos
             $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
+                'name' => $validated['registerName'],
+                'email' => $validated['registerEmail'],
+                'password' => Hash::make($validated['registerPassword']),
                 'bio' => $request->input('bio', ''),
                 'profile_photo_path' => $request->input('profile_photo_path', ''),
                 'role' => 'user', 
