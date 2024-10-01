@@ -122,14 +122,10 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => {
             return response.json().then(data => {
-                if (response.ok) {
-                    if (data.success) {
-                        window.location.href = data.redirect;
-                    }
-                } else {
-                    if (data.errors) {
-                        displayMessages(errorContainer, data.errors);
-                    }
+                if (data.errors) {
+                    displayMessages(errorContainer, data.errors);
+                } else if (data.success) {
+                    window.location.href = data.redirect;
                 }
             });
         })
