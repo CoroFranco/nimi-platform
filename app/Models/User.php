@@ -37,4 +37,17 @@ class User extends Authenticatable
 {
     return $this->hasMany(Course::class, 'instructor_id');
 }
+
+public function calculateProgress(User $user)
+{
+    $totalLessons = $this->lessons()->count();
+    $completedLessons = $this->lessons()
+        ->whereHas('progress', function ($query) use ($user) {
+            $query->where('user_id', $user->id)
+                  ->where('status', 'completed');
+        })
+        ->count();
+
+    return $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
+}
 }

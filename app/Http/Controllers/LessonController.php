@@ -73,50 +73,41 @@ class LessonController extends Controller
 
 public function completeLesson(Request $request, Course $course, Lesson $lesson)
 {
-    $this->authorize('view', $course);
+    try {
+        Log::info($course->id);
+        Log::info($lesson->id);
 
-    $user = Auth::user();
+        $user = Auth::user();
 
-    // Verifica que la lección pertenezca al curso actual
-    if (!$course->modules()->whereHas('lessons', function ($query) use ($lesson) {
-        $query->where('id', $lesson->id);
-    })->exists()) {
-        return redirect()->back()->with('error', 'This lesson does not belong to the course.');
+        // Verifica que la lección pertenezca al curso actual
+        if (!$course->lessons()->where('lessons.id', $lesson->id)->exists()) {
+            return redirect()->back()->with('error', 'This lesson does not belong to the course.');
+        }
+
+        // Marca la lección como completada
+        LessonProgress::updateOrCreate(
+            ['user_id' => $user->id, 'lesson_id' => $lesson->id],
+            ['status' => 'completed']
+        );
+
+        // Calcula el progreso del curso
+        $progress = $course->calculateProgress($user);
+
+        // Actualiza o crea el registro de inscripción con el nuevo progreso
+        $enrollment = Enrollment::updateOrCreate(
+            ['user_id' => $user->id, 'course_id' => $course->id],
+            ['progress' => $progress]
+        );
+
+        return redirect()->back()->with('success', 'Lesson marked as completed!');
+    } catch (\Exception $e) {
+        Log::error('Error in completeLesson: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'An error occurred while completing the lesson.');
     }
-
-    // Marca la lección como completada
-    LessonProgress::updateOrCreate(
-        ['user_id' => $user->id, 'lesson_id' => $lesson->id],
-        ['status' => 'completed']
-    );
-
-    // Calcula el progreso del curso
-    $totalLessons = $course->modules->flatMap->lessons->count();
-    $completedLessons = LessonProgress::where('user_id', $user->id)
-        ->whereIn('lesson_id', $course->modules->flatMap->lessons->pluck('id'))
-        ->where('status', 'completed')
-        ->count();
-
-    $progress = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
-
-    // Actualiza o crea el registro de inscripción con el nuevo progreso
-    Enrollment::updateOrCreate(
-        ['user_id' => $user->id, 'course_id' => $course->id],
-        ['progress' => $progress]
-    );
-
-    // Comprueba si el curso está completado
-    if ($progress == 100) {
-        // Aquí puedes agregar lógica adicional para la finalización del curso (por ejemplo, emisión de un certificado)
-    }
-
-    return redirect()->back()->with('success', 'Lesson marked as completed!');
 }
 
     public function submitQuiz(Request $request, Course $course, Lesson $lesson)
     {
-        $this->authorize('view', $course);
-
         $validatedData = $request->validate([
             'answers' => 'required|array',
             'answers.*' => 'required|string',
@@ -124,9 +115,6 @@ public function completeLesson(Request $request, Course $course, Lesson $lesson)
 
         $quizQuestions = $lesson->quizQuestions;
         $correctAnswers = 0;
-
-        
-        
 
         foreach ($quizQuestions as $question) {
             Log::info('Respuesta correcta: ' . $question->correct_answer);

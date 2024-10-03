@@ -103,14 +103,13 @@
                         @foreach($courses as $course) 
                             <div class="bg-white p-4 rounded-lg shadow-md">
                                 @php
-                                    // Obtener la siguiente lección después de omitir las completadas
-                                    $nextLesson = $lessonsByCourse[$course->id]
-                                        ->sortBy('less_order')
-                                        ->skip($completedLessonsCountByCourse[$course->id]+1)
-                                        ->first();
+                                    // Obtener la última lección completada por el usuario en este curso, si existe
+                                    $lastCompletedLesson = $lastCompletedLessonByCourse[$course->id] ?? null;
+                                    // Si hay una última lección completada, usa su ID, de lo contrario usa la primera lección
+                                    $nextLessonId = $lastCompletedLesson ? $lastCompletedLesson->id : $lessonsByCourse[$course->id]->first()->id;
                                 @endphp
 
-                                <a href="/courses/{{$course->id}}/lessons/{{$nextLesson ? $nextLesson->id : $lessonsByCourse[$course->id]->last()->id}}">
+                                <a href="/courses/{{$course->id}}/lessons/{{$nextLessonId > 0 ? $nextLessonId : $lessonsByCourse[$course->id]->last()->id}}">
                                     <h3 class="font-bold text-lg text-[var(--hover-color)] mb-2">{{$course->title}}</h3>
                                 </a>                                
                               <div class="flex justify-between items-center mb-2">
@@ -198,7 +197,7 @@
                     <div >
                         <div class="flex justify-between">
                             <button id="newPasswordBtn" class="profileButton">Cambiar Contraseña</button>
-                            <button type="submit" class="profileButton">Guardar cambios</button>
+                            <button id="saveChangeBtn" type="submit" class="profileButton">Guardar cambios</button>
                         </div>
                     
                     </div>

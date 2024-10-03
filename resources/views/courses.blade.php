@@ -243,30 +243,35 @@
         </main>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
     <script>
+        gsap.registerPlugin(ScrollTrigger);
+    
         document.addEventListener('DOMContentLoaded', (event) => {
             // Progress bar animation
             const progressBar = document.getElementById('progressBar');
             const progressText = document.getElementById('progressText');
             const progress = {{ $progress }};
             
-
-            gsap.to(progressBar, {
-                width: `${progress}%`,
-                duration: 1.5,
-                ease: "power2.out",
-                onUpdate: function() {
-                    progressText.textContent = `${Math.round(progressBar.offsetWidth / progressBar.parentNode.offsetWidth * 100)}%`;
-                }
-            });
-
+            if (progressBar && progressText) {
+                gsap.to(progressBar, {
+                    width: `${progress}%`,
+                    duration: 1.5,
+                    ease: "power2.out",
+                    onUpdate: function() {
+                        progressText.textContent = `${Math.round(progressBar.offsetWidth / progressBar.parentNode.offsetWidth * 100)}%`;
+                    }
+                });
+            }
+    
             // Module toggle animation
             const moduleToggles = document.querySelectorAll('.module-toggle');
             moduleToggles.forEach(toggle => {
                 toggle.addEventListener('click', function() {
                     const moduleContent = this.nextElementSibling;
                     const chevron = this.querySelector('svg');
-
+    
                     if (moduleContent.style.display === 'none' || moduleContent.style.display === '') {
                         moduleContent.style.display = 'block';
                         gsap.from(moduleContent, {height: 0, opacity: 0, duration: 0.3, ease: "power2.out"});
@@ -287,45 +292,49 @@
                     }
                 });
             });
-
+    
             // Tab switching animation
             const contentTab = document.getElementById('contentTab');
             const commentsTab = document.getElementById('commentsTab');
             const contentSection = document.getElementById('contentSection');
             const commentsSection = document.getElementById('commentsSection');
-
+    
             function switchTab(activeTab, activeSection, inactiveTab, inactiveSection) {
                 activeTab.classList.add('text-[var(--highlight-color)]', 'border-b-2', 'border-[var(--hover-color)]');
                 activeTab.classList.remove('text-[var(--text-gray)]', 'hover:text-[var(--text-color-index)]');
                 inactiveTab.classList.remove('text-[var(--highlight-color)]', 'border-b-2', 'border-[var(--hover-color)]');
                 inactiveTab.classList.add('text-[var(--text-gray)]', 'hover:text-[var(--text-color-index)]');
-
+    
                 gsap.to(inactiveSection, {opacity: 0, y: 20, duration: 0.3, onComplete: () => {
                     inactiveSection.style.display = 'none';
                     activeSection.style.display = 'block';
                     gsap.fromTo(activeSection, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
                 }});
             }
-
-            contentTab.addEventListener('click', () => switchTab(contentTab, contentSection, commentsTab, commentsSection));
-            commentsTab.addEventListener('click', () => switchTab(commentsTab, commentsSection, contentTab, contentSection));
-
+    
+            if (contentTab && commentsTab) {
+                contentTab.addEventListener('click', () => switchTab(contentTab, contentSection, commentsTab, commentsSection));
+                commentsTab.addEventListener('click', () => switchTab(commentsTab, commentsSection, contentTab, contentSection));
+            }
+    
             // Comment animation
             const comments = document.querySelectorAll('#commentsSection > div');
-            gsap.set(comments, {opacity: 0, y: 20});
-            gsap.to(comments, {
-                opacity: 1,
-                y: 0,
-                duration: 0.5,
-                stagger: 0.1,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: "#commentsSection",
-                    start: "top bottom-=100px",
-                    toggleActions: "play none none none"
-                }
-            });
-
+            if (comments.length > 0) {
+                gsap.set(comments, {opacity: 0, y: 20});
+                gsap.to(comments, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    stagger: 0.1,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: "#commentsSection",
+                        start: "top bottom-=100px",
+                        toggleActions: "play none none none"
+                    }
+                });
+            }
+    
             // Delete comment animation
             document.querySelectorAll('.delete-comment').forEach(button => {
                 button.addEventListener('click', function(e) {
@@ -361,105 +370,101 @@
                     }
                 });
             });
-
-            document.getElementById('commentForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Evita el envío del formulario y la recarga de la página
-
-    const commentContent = document.getElementById('commentContent').value;
-    const formData = new FormData(this);
-
-    axios.post(this.action, formData)
-        .then(response => {
-            if (response.data.success) {
-                const newComment = response.data.comment;
-                
-                // Crear el nuevo comentario en el DOM
-                const commentList = document.getElementById('commentsSection');
-                const newCommentHtml = `
-                    <div id="comment-${newComment.id}" class="bg-[var(--course-card-bg)] p-4 rounded-lg shadow mb-4 transition-all duration-200 hover:shadow-md opacity-0 transform translate-y-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
-                                    ${newComment.user.profile_photo_url ? 
-                                        `<img src="${newComment.user.profile_photo_url}" alt="${newComment.user.name}" class="w-full h-full object-cover">` : 
-                                        `<div class="w-full h-full flex items-center justify-center bg-[var(--text-color)] text-[var(--text-gray)] text-[1.5rem] font-bold">
-                                            ${newComment.user.name.charAt(0).toUpperCase()}
-                                        </div>`}
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-[var(--course-main-color)]">${newComment.user.name}</p>
-                                    <p class="text-[1.2rem] text-[var(--text-gray)]">Just now</p>
-                                </div>
-                            </div>
-                            ${newComment.user_id === {{ Auth::id() }} ? 
-                                `<button class="text-red-400 hover:text-red-300 transition duration-200 delete-comment" data-comment-id="${newComment.id}">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>` : ''}
-                        </div>
-                        <p class="mt-2 text-[var(--text-gray)]">${newComment.content}</p>
-                    </div>`;
-
-                    const lastComment = document.querySelector('#commentForm');
-
-                // Inserta el nuevo comentario después del último comentario
-                    lastComment.insertAdjacentHTML('afterend', newCommentHtml);
-                
-
-                // Limpiar el campo de texto
-                document.getElementById('commentContent').value = '';
-
-                // Animar el nuevo comentario
-                const newCommentElement = document.getElementById(`comment-${newComment.id}`);
-                gsap.to(newCommentElement, {opacity: 1, translateY: 0, duration: 0.5});
+    
+            const commentForm = document.getElementById('commentForm');
+            if (commentForm) {
+                commentForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+    
+                    const commentContent = document.getElementById('commentContent').value;
+                    const formData = new FormData(this);
+    
+                    axios.post(this.action, formData)
+                        .then(response => {
+                            if (response.data.success) {
+                                const newComment = response.data.comment;
+                                
+                                const commentList = document.getElementById('commentsSection');
+                                const newCommentHtml = `
+                                    <div id="comment-${newComment.id}" class="bg-[var(--course-card-bg)] p-4 rounded-lg shadow mb-4 transition-all duration-200 hover:shadow-md opacity-0 transform translate-y-4">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                                    ${newComment.user.profile_photo_url ? 
+                                                        `<img src="${newComment.user.profile_photo_url}" alt="${newComment.user.name}" class="w-full h-full object-cover">` : 
+                                                        `<div class="w-full h-full flex items-center justify-center bg-[var(--text-color)] text-[var(--text-gray)] text-[1.5rem] font-bold">
+                                                            ${newComment.user.name.charAt(0).toUpperCase()}
+                                                        </div>`}
+                                                </div>
+                                                <div>
+                                                    <p class="font-semibold text-[var(--course-main-color)]">${newComment.user.name}</p>
+                                                    <p class="text-[1.2rem] text-[var(--text-gray)]">Just now</p>
+                                                </div>
+                                            </div>
+                                            ${newComment.user_id === {{ Auth::id() }} ? 
+                                                `<button class="text-red-400 hover:text-red-300 transition duration-200 delete-comment" data-comment-id="${newComment.id}">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                </button>` : ''}
+                                        </div>
+                                        <p class="mt-2 text-[var(--text-gray)]">${newComment.content}</p>
+                                    </div>`;
+    
+                                const lastComment = document.querySelector('#commentForm');
+                                lastComment.insertAdjacentHTML('afterend', newCommentHtml);
+    
+                                document.getElementById('commentContent').value = '';
+    
+                                const newCommentElement = document.getElementById(`comment-${newComment.id}`);
+                                gsap.to(newCommentElement, {opacity: 1, translateY: 0, duration: 0.5});
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error posting comment:', error);
+                        });
+                });
             }
-        })
-        .catch(error => {
-            console.error('Error posting comment:', error);
-        });
-});
-
-document.getElementById('quiz-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevenir que se recargue la página
-
-    const formData = new FormData(this); // Obtener los datos del formulario
-    const quizResultsDiv = document.getElementById('quiz-results');
-
-    fetch('{{ route("courses.submit-quiz", [$course->id, $lesson->id]) }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: formData
-    })
-    .then(response => response.json()) // Parsear la respuesta como JSON
-    .then(data => {
-        if (data.success) {
-            console.log(typeof data.quizResults.score);
-                if(data.quizResults.score > 50){
-                    quizResultsDiv.innerHTML = `
-                <p class='text-green-500'>Puntaje: ${data.quizResults.score}%</p>
-                <p class='text-green-500'>Respuestas Correctas: ${data.quizResults.correctAnswers} de ${data.quizResults.totalQuestions}</p>
-            `;
-                }else{
-                    quizResultsDiv.innerHTML = `
-                <p class='text-red-500'>Puntaje: ${data.quizResults.score}%</p>
-                <p class='text-red-500'>Respuestas Correctas: ${data.quizResults.correctAnswers} de ${data.quizResults.totalQuestions}</p>
-            `;
-                }
-
-        } else {
-            quizResultsDiv.innerHTML = `<p>Hubo un error al procesar el cuestionario.</p>`;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        quizResultsDiv.innerHTML = `<p>Hubo un error al procesar el cuestionario.</p>`;
-    });
-});
-
-
+    
+            const quizForm = document.getElementById('quiz-form');
+            if (quizForm) {
+                quizForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+    
+                    const formData = new FormData(this);
+                    const quizResultsDiv = document.getElementById('quiz-results');
+    
+                    fetch('{{ route("courses.submit-quiz", [$course->id, $lesson->id]) }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if(data.quizResults.score > 50){
+                                quizResultsDiv.innerHTML = `
+                            <p class='text-green-500'>Score: ${data.quizResults.score}%</p>
+                            <p class='text-green-500'>Correct Answers: ${data.quizResults.correctAnswers} out of ${data.quizResults.totalQuestions}</p>
+                        `;
+                            } else {
+                                quizResultsDiv.innerHTML = `
+                            <p class='text-red-500'>Score: ${data.quizResults.score}%</p>
+                            <p class='text-red-500'>Correct Answers: ${data.quizResults.correctAnswers} out of ${data.quizResults.totalQuestions}</p>
+                        `;
+                            }
+                        } else {
+                            quizResultsDiv.innerHTML = `<p>There was an error processing the quiz.</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        quizResultsDiv.innerHTML = `<p>There was an error processing the quiz.</p>`;
+                    });
+                });
+            }
         });
     </script>
 

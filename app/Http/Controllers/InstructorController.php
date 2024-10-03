@@ -29,7 +29,7 @@ class InstructorController extends Controller
         $user = Auth::user();
         $haveAplication = InstructorApplication::where('user_id', $user->id)->first();
         
-        if ($haveAplication && $haveAplication->status != 'pending'){
+        if ($haveAplication){
             return redirect()->route('profile')->withErrors(['error' => 'Ya tienes una solicitud en proceso por favor espera respuesta.']);
         } else {
             $application = new InstructorApplication([

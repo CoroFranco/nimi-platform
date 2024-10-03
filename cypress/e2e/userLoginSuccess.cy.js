@@ -8,7 +8,7 @@ describe('Login de usuario', () => {
 
         cy.get('#loginButton').click()
 
-        cy.contains('Correo o Contraseña incorrectos.').should('be.visible');
+        cy.contains('Contraseña incorrecta.').should('be.visible');
 
         cy.get('input[name="password"]').clear().type('123456789')
 

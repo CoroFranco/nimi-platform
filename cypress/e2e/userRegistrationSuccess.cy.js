@@ -5,7 +5,7 @@ describe('Registro de Usuario', () => {
     cy.contains('¿No tienes cuenta? Regístrate').click();
 
     cy.get('input[name="registerName"]').type('Juan');
-    cy.get('input[name="registerEmail"]').type('juan@example2.com');
+    cy.get('input[name="registerEmail"]').type('juan@example3.com');
     cy.get('input[name="registerPassword"]').type('12345678');
     cy.get('input[name="registerReapetPassword"]').type('12345678');
 
